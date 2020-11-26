@@ -34,6 +34,24 @@
             }
         }
         
+        // Удаление перспективного планирования
+        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_perspective_planning_submit'])) {
+            $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+            
+            if($conn->connect_error) {
+                die('Ошибка соединения: '.$conn->connect_error);
+            }
+            
+            $id = $_POST['id'];
+            $sql = "delete from perspective_planning where id=$id";
+            
+            if (!$conn->query($sql) === true) {
+                $error_message = $conn->error;
+            }
+            
+            $conn->close();
+        }
+        
         // Если нет параметра id, переход к списку
         if(!isset($_GET['id'])) {
             header('Location: '.APPLICATION.'/organization/');
@@ -182,7 +200,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="col-6">
+                <div class="col-12 col-md-6">
                     <h2>Контакты</h2>
                     <table class="table table-bordered">
                         <thead>
@@ -237,6 +255,82 @@
                     </table>
                 </div>
             </div>
+            <br/>
+            <hr/>
+            <br/>
+            <div class="d-flex justify-content-between mb-auto">
+                <div class="p-1">
+                    <h2 id="perspective_planning">Перспективное планирование</h2>
+                </div>
+                <div class="p-1">
+                    <a href="<?=APPLICATION ?>/perspective_planning/create.php?organization_id=<?=$_GET['id'] ?>" class="btn btn-outline-dark"><span class="font-awesome">&#xf067;</span>&nbsp;Добавить</a>
+                </div>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Дата&nbsp;&ndash;</th>
+                        <th>Дата</th>
+                        <th>Дата&nbsp;+</th>
+                        <th>Цена</th>
+                        <th>Затраты</th>
+                        <th>Тип плёнки</th>
+                        <th>Толщина плёнки</th>
+                        <th>Ширина плёнки</th>
+                        <th>Длина плёнки</th>
+                        <th>Вес плёнки</th>
+                        <th>Цена плёнки</th>
+                        <th>Краска</th>
+                        <th>Формы</th>
+                        <th>Вероятность (%)</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $organization_id = $_GET['id'];
+                    $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+                    $sql = "select pp.id, pp.date, date_format(pp.date, '%d.%m.%Y') fdate, pp.date_minus, date_format(pp.date_minus, '%d.%m.%Y') fdate_minus, pp.date_plus, date_format(pp.date_plus, '%d.%m.%Y') fdate_plus, pp.price, pp.expenses, f.name film, pp.film_thickness, pp.film_width, pp.film_length, pp.film_weight, pp.film_price, pp.paint, pp.form, pp.probability "
+                            . "from perspective_planning pp left join film f on pp.film_id = f.id "
+                            . "where pp.organization_id=$organization_id "
+                            . "order by pp.date desc";
+                    
+                    if($conn->connect_error) {
+                        die('Ошибка соединения: ' . $conn->connect_error);
+                    }
+                    $result = $conn->query($sql);
+                    if ($result->num_rows > 0) {
+                        while($row = $result->fetch_assoc()) {
+                            echo "<tr>"
+                            ."<td>".$row['fdate_minus']."</td>"
+                            ."<td>".$row['fdate']."</td>"
+                            ."<td>".$row['fdate_plus']."</td>"
+                            ."<td>".$row['price']."</td>"
+                            ."<td>".$row['expenses']."</td>"
+                            ."<td>". htmlentities($row['film'])."</td>"
+                            ."<td>".$row['film_thickness']."</td>"
+                            ."<td>".$row['film_width']."</td>"
+                            ."<td>".$row['film_length']."</td>"
+                            ."<td>".$row['film_weight']."</td>"
+                            ."<td>".$row['film_price']."</td>"
+                            ."<td>".$row['paint']."</td>"
+                            ."<td>".$row['form']."</td>"
+                            ."<td>".$row['probability']."</td>"
+                            ."<td><a href='".APPLICATION."/perspective_planning/edit.php?id=".$row['id']."' class='btn btn-outline-dark'><span class='font-awesome'>&#xf044;</span></a></td>"
+                            ."<td>"
+                            ."<form method='post'>"
+                            ."<input type='hidden' id='id' name='id' value='".$row['id']."' />"
+                            ."<button type='submit' id='delete_perspective_planning_submit' name='delete_perspective_planning_submit' class='btn btn-outline-dark' onclick='javascript: return confirm(\"Действительно удалить?\");'><span class='font-awesome'>&#xf1f8;</span></button>"
+                            ."</form>"
+                            ."</td>"
+                            ."</tr>";
+                        }
+                    }
+                    $conn->close();
+                    ?>
+                </tbody>
+            </table>
         </div>
         <?php
         include '../include/footer.php';

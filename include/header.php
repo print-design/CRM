@@ -98,8 +98,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['logout_submit'])) {
             $call_status = $_SERVER['PHP_SELF'] == APPLICATION.'/contact/index.php' ? ' disabled' : '';
             $planned_status = $_SERVER['PHP_SELF'] == APPLICATION.'/planned/index.php' ? ' disabled' : '';
             $order_status = $_SERVER['PHP_SELF'] == APPLICATION.'/order/index.php' ? ' disabled' : '';
-            $manager_status = $_SERVER['PHP_SELF'] == APPLICATION.'/manager/index.php' ? ' disabled' : '';
             $personal_status = $_SERVER['PHP_SELF'] == APPLICATION.'/personal/index.php' ? ' disabled' : '';
+            $manager_status = $_SERVER['PHP_SELF'] == APPLICATION.'/manager/index.php' ? ' disabled' : '';
+            $film_status = $_SERVER['PHP_SELF'] == APPLICATION.'/film/index.php' ? ' disabled' : '';
 
             if(LoggedIn()) {
                 // Количество запланированных контактов
@@ -143,17 +144,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['logout_submit'])) {
             </li>
             <?php
             }
-            if(IsInRole('admin')) {
-            ?>
-            <li class="nav-item">
-                <a class="nav-link<?=$manager_status ?>" href="<?=APPLICATION ?>/manager/">Менеджеры</a>
-            </li>
-            <?php
-            }
             if(LoggedIn()) {
             ?>
             <li class="nav-item">
                 <a class="nav-link<?=$personal_status ?>" href="<?=APPLICATION ?>/personal/">Мои настройки</a>
+            </li>
+            <?php
+            }
+            if(IsInRole('admin')) {
+            ?>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                    Администратор
+                </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item<?=$manager_status ?>" href="<?=APPLICATION ?>/manager/">Менеджеры</a>
+                    <a class="dropdown-item<?=$film_status ?>" href="<?=APPLICATION ?>/film/">Типы плёнки</a>
+                </div>
             </li>
             <?php
             }

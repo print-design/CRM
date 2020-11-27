@@ -102,10 +102,20 @@
                         <div class="row">
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="name">Цена</label>
-                                    <input type="number" step="0.01" id="price" name="price" class="form-control float-only" value="" autocomplete="off" />
+                                    <label for="name">Затраты</label>
+                                    <input type="number" step="0.01" id="expenses" name="expenses" class="form-control float-only" value="" autocomplete="off" />
                                 </div>
                             </div>
+                            <div class="col-4"></div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="name">Вероятность (%)</label>
+                                    <input type="number" step="1" id="probability" name="probability" class="form-control int-only" value="" autocomplete="off" />
+                                </div>
+                            </div>
+                        </div>
+                        <br/><br/><br/>
+                        <div class="row">
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="name">Тип плёнки</label>
@@ -132,66 +142,30 @@
                             </div>
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="name">Краски</label>
-                                    <input type="number" step="1" id="paint" name="paint" class="form-control int-only" value="" autocomplete="off" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label for="name">Затраты</label>
-                                    <input type="number" step="0.01" id="expenses" name="expenses" class="form-control float-only" value="" autocomplete="off" />
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="form-group">
                                     <label for="name">Толщина плёнки</label>
                                     <input type="number" step="1" id="film_thickness" name="film_thickness" class="form-control int-only" value="" autocomplete="off" />
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="name">Формы</label>
-                                    <input type="number" step="1" id="form" name="form" class="form-control int-only" value="" autocomplete="off" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4"></div>
-                            <div class="col-4">
-                                <div class="form-group">
                                     <label for="name">Ширина плёнки</label>
                                     <input type="number" step="1" id="film_width" name="film_width" class="form-control int-only" value="" autocomplete="off" />
                                 </div>
                             </div>
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label for="name">Вероятность (%)</label>
-                                    <input type="number" step="1" id="probability" name="probability" class="form-control int-only" value="" autocomplete="off" />
-                                </div>
-                            </div>
                         </div>
                         <div class="row">
-                            <div class="col-4"></div>
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="name">Длина плёнки</label>
                                     <input type="number" step="1" id="film_length" name="film_length" class="form-control int-only" value="" autocomplete="off" />
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4"></div>
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="name">Вес плёнки</label>
                                     <input type="number" step="1" id="film_weight" name="film_weight" class="form-control int-only" value="" autocomplete="off" />
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4"></div>
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="name">Цена плёнки</label>

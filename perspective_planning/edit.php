@@ -151,10 +151,19 @@
                         <div class="row">
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="name">Цена</label>
-                                    <input type="number" step="0.01" id="price" name="price" class="form-control float-only" value="<?=$_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['price']) ? $_POST['price'] : $price ?>" autocomplete="off" />
+                                    <label for="name">Затраты</label>
+                                    <input type="number" step="0.01" id="expenses" name="expenses" class="form-control float-only" value="<?=$_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['expenses']) ? $_POST['expenses'] : $expenses ?>" autocomplete="off" />
                                 </div>
                             </div>
+                            <div class="col-4"></div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="name">Вероятность (%)</label>
+                                    <input type="number" step="1" id="probability" name="probability" class="form-control int-only" value="<?=$_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['probability']) ? $_POST['probability'] : $probability ?>" autocomplete="off" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="name">Тип плёнки</label>
@@ -188,32 +197,10 @@
                             </div>
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="name">Краски</label>
-                                    <input type="number" step="1" id="paint" name="paint" class="form-control int-only" value="<?=$_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['paint']) ? $_POST['paint'] : $paint ?>" autocomplete="off" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label for="name">Затраты</label>
-                                    <input type="number" step="0.01" id="expenses" name="expenses" class="form-control float-only" value="<?=$_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['expenses']) ? $_POST['expenses'] : $expenses ?>" autocomplete="off" />
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="form-group">
                                     <label for="name">Толщина плёнки</label>
                                     <input type="number" step="1" id="film_thickness" name="film_thickness" class="form-control int-only" value="<?=$_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['film_thickness']) ? $_POST['film_thickness'] : $film_thickness ?>" autocomplete="off" />
                                 </div>
                             </div>
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label for="name">Формы</label>
-                                    <input type="number" step="1" id="form" name="form" class="form-control int-only" value="<?=$_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['form']) ? $_POST['form'] : $form ?>" autocomplete="off" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
                             <div class="col-4"></div>
                             <div class="col-4">
                                 <div class="form-group">
@@ -221,33 +208,20 @@
                                     <input type="number" step="1" id="film_width" name="film_width" class="form-control int-only" value="<?=$_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['film_width']) ? $_POST['film_width'] : $film_width ?>" autocomplete="off" />
                                 </div>
                             </div>
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label for="name">Вероятность (%)</label>
-                                    <input type="number" step="1" id="probability" name="probability" class="form-control int-only" value="<?=$_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['probability']) ? $_POST['probability'] : $probability ?>" autocomplete="off" />
-                                </div>
-                            </div>
                         </div>
                         <div class="row">
-                            <div class="col-4"></div>
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="name">Длина плёнки</label>
                                     <input type="number" step="1" id="film_length" name="film_length" class="form-control int-only" value="<?=$_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['film_length']) ? $_POST['film_length'] : $film_length ?>" autocomplete="off" />
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4"></div>
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="name">Вес плёнки</label>
                                     <input type="number" step="1" id="film_weight" name="film_weight" class="form-control int-only" value="<?=$_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['film_weight']) ? $_POST['film_weight'] : $film_weight ?>" autocomplete="off" />
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4"></div>
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="name">Цена плёнки</label>

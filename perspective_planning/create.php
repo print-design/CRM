@@ -22,7 +22,6 @@
                 $date = $_POST['date'] == '' ? 'NULL' : "'".$_POST['date']."'";
                 $date_minus = $_POST['date_minus'] == '' ? 'NULL' : "'".$_POST['date_minus']."'";
                 $date_plus = $_POST['date_plus'] == '' ? 'NULL' : "'".$_POST['date_plus']."'";
-                $price = $_POST['price'] == '' ? 'NULL' : $_POST['price'];
                 $expenses = $_POST['expenses'] == '' ? 'NULL' : $_POST['expenses'];
                 $film_id = $_POST['film_id'] == '' ? 'NULL' : $_POST['film_id'];
                 $film_thickness = $_POST['film_thickness'] == '' ? 'NULL' : $_POST['film_thickness'];
@@ -30,12 +29,10 @@
                 $film_length = $_POST['film_length'] == '' ? 'NULL' : $_POST['film_length'];
                 $film_weight = $_POST['film_weight'] == '' ? 'NULL' : $_POST['film_weight'];
                 $film_price = $_POST['film_price'] == '' ? 'NULL' : $_POST['film_price'];
-                $paint = $_POST['paint'] == '' ? 'NULL' : $_POST['paint'];
-                $form = $_POST['form'] == '' ? 'NULL' : $_POST['form'];
                 $probability = $_POST['probability'] == '' ? 'NULL' : $_POST['probability'];
                 
-                $sql = "insert into perspective_planning (organization_id, date, date_minus, date_plus, price, expenses, film_id, film_thickness, film_width, film_length, film_weight, film_price, paint, form, probability) "
-                        . "values ($organization_id, $date, $date_minus, $date_plus, $price, $expenses, $film_id, $film_thickness, $film_width, $film_length, $film_weight, $film_price, $paint, $form, $probability)";
+                $sql = "insert into perspective_planning (organization_id, date, date_minus, date_plus, expenses, film_id, film_thickness, film_width, film_length, film_weight, film_price, probability) "
+                        . "values ($organization_id, $date, $date_minus, $date_plus, $expenses, $film_id, $film_thickness, $film_width, $film_length, $film_weight, $film_price, $probability)";
                 
                 if ($conn->query($sql) === true) {
                     header('Location: '.APPLICATION.'/organization/details.php?id='.$organization_id.'#perspective_planning');

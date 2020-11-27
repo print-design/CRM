@@ -23,7 +23,6 @@
                 $date = $_POST['date'] == '' ? 'NULL' : "'".$_POST['date']."'";
                 $date_minus = $_POST['date_minus'] == '' ? 'NULL' : "'".$_POST['date_minus']."'";
                 $date_plus = $_POST['date_plus'] == '' ? 'NULL' : "'".$_POST['date_plus']."'";
-                $price = $_POST['price'] == '' ? 'NULL' : $_POST['price'];
                 $expenses = $_POST['expenses'] == '' ? 'NULL' : $_POST['expenses'];
                 $film_id = $_POST['film_id'] == '' ? 'NULL' : $_POST['film_id'];
                 $film_thickness = $_POST['film_thickness'] == '' ? 'NULL' : $_POST['film_thickness'];
@@ -31,13 +30,11 @@
                 $film_length = $_POST['film_length'] == '' ? 'NULL' : $_POST['film_length'];
                 $film_weight = $_POST['film_weight'] == '' ? 'NULL' : $_POST['film_weight'];
                 $film_price = $_POST['film_price'] == '' ? 'NULL' : $_POST['film_price'];
-                $paint = $_POST['paint'] == '' ? 'NULL' : $_POST['paint'];
-                $form = $_POST['form'] == '' ? 'NULL' : $_POST['form'];
                 $probability = $_POST['probability'] == '' ? 'NULL' : $_POST['probability'];
                 
-                $sql = "update perspective_planning set organization_id=$organization_id, date=$date, date_minus=$date_minus, date_plus=$date_plus, price=$price, "
+                $sql = "update perspective_planning set organization_id=$organization_id, date=$date, date_minus=$date_minus, date_plus=$date_plus, "
                         . "expenses=$expenses, film_id=$film_id, film_thickness=$film_thickness, film_width=$film_width, film_length=$film_length, "
-                        . "film_weight=$film_weight, film_price=$film_price, paint=$paint, form=$form, probability=$probability "
+                        . "film_weight=$film_weight, film_price=$film_price, probability=$probability "
                         . "where id=$id";
                 
                 if ($conn->query($sql) === true) {
@@ -62,7 +59,6 @@
         $date = '';
         $date_minus = '';
         $date_plus = '';
-        $price = '';
         $expenses = '';
         $film_id = '';
         $film_thickness = '';
@@ -70,12 +66,10 @@
         $film_length = '';
         $film_weight = '';
         $film_price = '';
-        $paint = '';
-        $form = '';
         $probability = '';
         
         $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-        $sql = "select organization_id, date, date_minus, date_plus, price, expenses, film_id, film_thickness, film_width, film_length, film_weight, film_price, paint, form, probability "
+        $sql = "select organization_id, date, date_minus, date_plus, expenses, film_id, film_thickness, film_width, film_length, film_weight, film_price, probability "
                             . "from perspective_planning where id=".$_GET['id'];
         
         if($conn->connect_error) {
@@ -87,7 +81,6 @@
             $date = $row['date'];
             $date_minus = $row['date_minus'];
             $date_plus = $row['date_plus'];
-            $price = $row['price'];
             $expenses = $row['expenses'];
             $film_id = $row['film_id'];
             $film_thickness = $row['film_thickness'];
@@ -95,8 +88,6 @@
             $film_length = $row['film_length'];
             $film_weight = $row['film_weight'];
             $film_price = $row['film_price'];
-            $paint = $row['paint'];
-            $form = $row['form'];
             $probability = $row['probability'];
         }
         $conn->close();

@@ -272,7 +272,6 @@
                         <th>Дата&nbsp;&ndash;</th>
                         <th>Дата</th>
                         <th>Дата&nbsp;+</th>
-                        <th>Цена</th>
                         <th>Затраты</th>
                         <th>Тип плёнки</th>
                         <th>Толщина плёнки</th>
@@ -280,8 +279,6 @@
                         <th>Длина плёнки</th>
                         <th>Вес плёнки</th>
                         <th>Цена плёнки</th>
-                        <th>Краска</th>
-                        <th>Формы</th>
                         <th>Вероятность (%)</th>
                         <th></th>
                         <th></th>
@@ -291,7 +288,7 @@
                     <?php
                     $organization_id = $_GET['id'];
                     $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-                    $sql = "select pp.id, pp.date, date_format(pp.date, '%d.%m.%Y') fdate, pp.date_minus, date_format(pp.date_minus, '%d.%m.%Y') fdate_minus, pp.date_plus, date_format(pp.date_plus, '%d.%m.%Y') fdate_plus, pp.price, pp.expenses, f.name film, pp.film_thickness, pp.film_width, pp.film_length, pp.film_weight, pp.film_price, pp.paint, pp.form, pp.probability "
+                    $sql = "select pp.id, pp.date, date_format(pp.date, '%d.%m.%Y') fdate, pp.date_minus, date_format(pp.date_minus, '%d.%m.%Y') fdate_minus, pp.date_plus, date_format(pp.date_plus, '%d.%m.%Y') fdate_plus, pp.expenses, f.name film, pp.film_thickness, pp.film_width, pp.film_length, pp.film_weight, pp.film_price, pp.probability "
                             . "from perspective_planning pp left join film f on pp.film_id = f.id "
                             . "where pp.organization_id=$organization_id "
                             . "order by pp.date desc";
@@ -306,7 +303,6 @@
                             ."<td>".$row['fdate_minus']."</td>"
                             ."<td>".$row['fdate']."</td>"
                             ."<td>".$row['fdate_plus']."</td>"
-                            ."<td>".$row['price']."</td>"
                             ."<td>".$row['expenses']."</td>"
                             ."<td>". htmlentities($row['film'])."</td>"
                             ."<td>".$row['film_thickness']."</td>"
@@ -314,8 +310,6 @@
                             ."<td>".$row['film_length']."</td>"
                             ."<td>".$row['film_weight']."</td>"
                             ."<td>".$row['film_price']."</td>"
-                            ."<td>".$row['paint']."</td>"
-                            ."<td>".$row['form']."</td>"
                             ."<td>".$row['probability']."</td>"
                             ."<td><a href='".APPLICATION."/perspective_planning/edit.php?id=".$row['id']."' class='btn btn-outline-dark'><span class='font-awesome'>&#xf044;</span></a></td>"
                             ."<td>"

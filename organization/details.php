@@ -101,7 +101,7 @@
             }
             ?>
             <div class="row">
-                <div class="col-12 col-md-6">
+                <div class="col-12 col-md-5">
                     <div class="d-flex justify-content-between mb-2">
                         <div class="p-1">
                             <h1><?=$name ?></h1>
@@ -200,7 +200,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="col-12 col-md-6">
+                <div class="col-12 col-md-7">
                     <h2>Контакты</h2>
                     <table class="table table-bordered">
                         <thead>
@@ -209,11 +209,13 @@
                                 <th>Менеджер</th>
                                 <th>Конт. лицо</th>
                                 <th>Должность</th>
-                                <th>Телефон</th>
-                                <th>E-mail</th>
+                                <!--th>Телефон</th-->
+                                <!--th>E-mail</th-->
                                 <th>Результат</th>
                                 <th>Действ.</th>
                                 <th>След.</th>
+                                <th>Комментарий</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -221,7 +223,7 @@
                             $organization_id = $_GET['id'];
                             $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
                             $sql = "select c.id id, date_format(c.date, '%d.%m.%Y') date, u.first_name, u.middle_name, u.last_name, r.name result, r.efficient, date_format(c.next_date, '%d.%m.%Y') next_date, "
-                                    . "p.name, p.position, p.phone, p.email "
+                                    . "p.name, p.position, p.phone, p.email, c.comment "
                                     . "from person p "
                                     . "inner join contact c "
                                     . "inner join manager u on c.manager_id = u.id "
@@ -241,11 +243,13 @@
                                         ."<td>".$row['last_name'].' '.mb_substr($row['first_name'], 0, 1, 'UTF-8').'. '.mb_substr($row['middle_name'], 0, 1, 'UTF-8').".</td>"
                                         ."<td>".$row['name']."</td>"
                                         ."<td>".$row['position']."</td>"
-                                        ."<td>".$row['phone']."</td>"
-                                        ."<td>".$row['email']."</td>"
+                                        //."<td>".$row['phone']."</td>"
+                                        //."<td>".$row['email']."</td>"
                                         ."<td>".$row['result']."</td>"
                                         ."<td>".($row['efficient'] == '1' ? '&#x2713;' : '')."</td>"
                                         ."<td>".$row['next_date']."</td>"
+                                        ."<td>".$row['comment']."</td>"
+                                        ."<td><a href='".APPLICATION."/contact/edit.php?id=".$row['id']."' class='btn btn-outline-dark'><span class='font-awesome'>&#xf044;</span></a></td>"
                                         ."</tr>";
                                 }
                             }

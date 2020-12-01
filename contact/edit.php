@@ -6,11 +6,10 @@
         include '../include/restrict_logged_in.php';
         ?>
         <link href="<?=APPLICATION ?>/css/jquery-ui.css" rel="stylesheet"/>
-        
         <?php
-        // Если нет параметра person
+        // Если нет параметра id
         // переходим к списку предприятий
-        if(!isset($_GET['person'])) {
+        if(!isset($_GET['id'])) {
             header('Location: '.APPLICATION.'/organization/');
         }
         
@@ -22,7 +21,7 @@
         $result_id_valid = '';
         
         // Обработка отправки формы
-        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['contact_create_submit'])) {
+        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['contact_edit_submit'])) {
             if($_POST['result_id'] == '') {
                 $result_id_valid = ISINVALID;
                 $form_valid = false;
@@ -34,26 +33,21 @@
                     die('Ошибка соединения: '.$conn->connect_error);
                 }
                 
-                $manager_id = $_POST['manager_id'];
-                $person_id = $_POST['person_id'] == '' ? 'NULL' : $_POST['person_id'];
+                $id = $_POST['id'];
                 $result_id = $_POST['result_id'];
                 $next_date = $_POST['next_date'] == '' ? 'NULL' : DateTime::createFromFormat("d.m.Y", $_POST['next_date']);
                 $next_timestamp = $_POST['next_date'] == '' ? 'NULL' : "from_unixtime(".$next_date->gettimestamp().")";
-                $comment = $_POST['comment'];
+                $comment = addslashes($_POST['comment']);
                 
-                $sql = "insert into contact "
-                        . "(manager_id, person_id, result_id, next_date, comment) "
-                        . "values "
-                        . "($manager_id, $person_id, $result_id, $next_timestamp, '$comment')";
+                $sql = "update contact set result_id=$result_id, next_date=$next_timestamp, comment='$comment' where id=$id";
                 
                 if ($conn->query($sql) === true) {
-                    $contact_id = $conn->insert_id;
                     $is_order = 0;
                     $organization_id = '';
                     
                     $sql_order = 'select p.organization_id, r.is_order from contact c '
                             . 'inner join person p on c.person_id = p.id '
-                            . 'inner join contact_result r on c.result_id = r.id where c.id='.$contact_id;
+                            . 'inner join contact_result r on c.result_id = r.id where c.id='.$id;
                     
                     $result_order = $conn->query($sql_order);
                     
@@ -82,7 +76,7 @@
             }
         }
         
-        // Получение контактного лица
+        // Получение объекта
         $person = '';
         $organization_id = '';
         $organization = '';
@@ -90,12 +84,19 @@
         $position = '';
         $phone = '';
         $email = '';
+        $result_id = '';
+        $next_date = '';
+        $comment = '';
         $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
         if($conn->connect_error) {
             die('Ошибка соединения: ' . $conn->connect_error);
         }
         
-        $sql = "select o.id organization_id, o.name organization, o.production, p.name person, p.position, p.phone, p.email from person p inner join organization o on p.organization_id = o.id where p.id=".$_GET['person'];
+        $sql = "select o.id organization_id, o.name organization, o.production, p.name person, p.position, p.phone, p.email, c.result_id, date_format(c.next_date, '%d.%m.%Y') next_date, c.comment "
+                . "from person p "
+                . "inner join organization o on p.organization_id = o.id "
+                . "inner join contact c on c.person_id = p.id "
+                . "where c.id=".$_GET['id'];
         
         $result = $conn->query($sql);
         
@@ -107,6 +108,9 @@
             $position = $row['position'];
             $phone = $row['phone'];
             $email = $row['email'];
+            $result_id = $row['result_id'];
+            $next_date = $row['next_date'];
+            $comment = htmlentities($row['comment']);
         }
         
         $conn->close();
@@ -146,8 +150,7 @@
                     </table>
                     <hr />
                     <form method="post">
-                        <input type="hidden" id="manager_id" name="manager_id" value="<?= GetManagerId() ?>"/>
-                        <input type="hidden" id="person_id" name="person_id" value="<?=isset($_GET['person']) ? $_GET['person'] : '' ?>" />
+                        <input type="hidden" id="id" name="id" value="<?=$_GET['id'] ?>"/>
                         <div class="form-group">
                             <label for="result_id">Результат контакта</label>
                             <select id="result_id" name="result_id" class="form-control<?=$result_id_valid ?>" required="required">
@@ -160,7 +163,13 @@
                                 $result = $conn->query("select id, name from contact_result order by ordinal");
                                 if ($result->num_rows > 0) {
                                     while ($row = $result->fetch_assoc()) {
-                                        $selected = $_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['result_id']) && $_POST['result_id'] == $row['id'] ? " selected='selected'" : "";
+                                        $selected = '';
+                                        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['result_id'])) {
+                                            $result_id = $_POST['result_id'];
+                                        }
+                                        if($result_id == $row['id']) {
+                                            $selected = " selected='selected'";
+                                        }
                                         echo "<option value='".$row['id']."'".$selected.">".$row["name"]."</option>";
                                     }
                                 }
@@ -170,15 +179,15 @@
                         </div>
                         <div class="form-group">
                             <label for="next_date">Дата следующего контакта</label>
-                            <input type="text" id="next_contact_date" name="next_date" class="form-control" value="<?=$_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['next_date']) ? $_POST['next_date'] : '' ?>" autocomplete="off" />
+                            <input type="text" id="next_contact_date" name="next_date" class="form-control" value="<?=$_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['next_date']) ? $_POST['next_date'] : $next_date ?>" autocomplete="off" />
                             <div class="invalid-feedback">Дата следующего звонка обязательно</div>
                         </div>
                         <div class="form-group">
                             <label for="comment">Комментарий</label>
-                            <textarea id="comment" name="comment" class="form-control" rows="5" value="<?=$_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['comment']) ? $_POST['comment'] : '' ?>"></textarea>
+                            <textarea id="comment" name="comment" class="form-control" rows="5"><?=$_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['comment']) ? $_POST['comment'] : $comment ?></textarea>
                         </div>
                         <div class="form-group">
-                            <button type="submit" class="btn btn-outline-dark" id="contact_create_submit" name="contact_create_submit">Сохранить</button>
+                            <button type="submit" class="btn btn-outline-dark" id="contact_create_submit" name="contact_edit_submit">Сохранить</button>
                         </div>
                     </form>
                 </div>

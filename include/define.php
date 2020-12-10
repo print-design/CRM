@@ -1,5 +1,5 @@
 <?php
-define('APPLICATION', '/CRM');
+define('APPLICATION', '/crm');
 
 define('DATABASE_HOST', 'localhost');
 define('DATABASE_USER', 'root');

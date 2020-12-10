@@ -65,6 +65,7 @@ include '../include/topscripts.php';
                     $sql = "select count(id) count from organization where manager_id=". GetManagerId()." "
                             . $find;
                     
+                    $conn->query('set names utf8');
                     $result = $conn->query($sql);
                     if ($result->num_rows > 0) {
                         if($row = $result->fetch_assoc()) {

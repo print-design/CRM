@@ -37,6 +37,7 @@ include '../include/topscripts.php';
                 $sql = "insert into perspective_planning (organization_id, date, date_minus, date_plus, expenses, film_id, film_thickness, film_width, film_length, film_weight, film_price, probability) "
                         . "values ($organization_id, $date, $date_minus, $date_plus, $expenses, $film_id, $film_thickness, $film_width, $film_length, $film_weight, $film_price, $probability)";
                 
+                $conn->query('set names utf8');
                 if ($conn->query($sql) === true) {
                     header('Location: '.APPLICATION.'/organization/details.php?id='.$organization_id.'#perspective_planning');
                 }
@@ -129,6 +130,7 @@ include '../include/topscripts.php';
                                             die('Ошибка соединения: ' . $conn->connect_error);
                                         }
                                         
+                                        $conn->query('set names utf8');
                                         $result = $conn->query($sql);
                                         if ($result->num_rows > 0) {
                                             while($row = $result->fetch_assoc()) {

@@ -45,6 +45,7 @@ include '../include/topscripts.php';
                 
                 $sql = "insert into payment (date, accountant_id, order_id, sum) values ($timestamp, $accountant_id, $order_id, $sum)";
                 
+                $conn->query('set names utf8');
                 if ($conn->query($sql) === true) {
                     header('Location: '.APPLICATION.'/order/details.php?id='.$order_id);
                 }
@@ -85,6 +86,8 @@ include '../include/topscripts.php';
         if($conn->connect_error) {
             die('Ошибка соединения: ' . $conn->connect_error);
         }
+        
+        $conn->query('set names utf8');
         $result = $conn->query($sql);
         if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
             $contact_date = $row['date'];

@@ -38,6 +38,7 @@ include '../include/topscripts.php';
                         . "values "
                         . "($manager_id, '$name', '$production', '$address')";
                 
+                $conn->query('set names utf8');
                 if ($conn->query($sql) === true) {
                     $last_id = $conn->insert_id;
                     header('Location: '.APPLICATION.'/organization/details.php?id='.$last_id);

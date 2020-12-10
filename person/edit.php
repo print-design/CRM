@@ -41,6 +41,7 @@ include '../include/topscripts.php';
                 
                 $sql = "update person set organization_id=$organization_id, name='$name', position='$position', phone='$phone', email='$email' where id=".$id;
                 
+                $conn->query('set names utf8');
                 if ($conn->query($sql) === true) {
                     header('Location: '.APPLICATION.'/organization/details.php?id='.$organization_id);
                 }

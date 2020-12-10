@@ -44,6 +44,7 @@ include '../include/topscripts.php';
                 
                 $sql = "update contact set result_id=$result_id, next_date=$next_timestamp, comment='$comment' where id=$id";
                 
+                $conn->query('set names utf8');
                 if ($conn->query($sql) === true) {
                     $is_order = 0;
                     $organization_id = '';
@@ -101,6 +102,7 @@ include '../include/topscripts.php';
                 . "inner join contact c on c.person_id = p.id "
                 . "where c.id=".$_GET['id'];
         
+        $conn->query('set names utf8');
         $result = $conn->query($sql);
         
         if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
@@ -163,6 +165,7 @@ include '../include/topscripts.php';
                                 if($conn->connect_error) {
                                     die('Ошибка соединения: ' . $conn->connect_error);
                                 }
+                                $conn->query('set names utf8');
                                 $result = $conn->query("select id, name from contact_result order by ordinal");
                                 if ($result->num_rows > 0) {
                                     while ($row = $result->fetch_assoc()) {

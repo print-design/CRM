@@ -53,6 +53,7 @@ include '../include/topscripts.php';
                         die('Ошибка соединения: ' . $conn->connect_error);
                     }
                     
+                    $conn->query('set names utf8');
                     $result = $conn->query($sql);
                     if ($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {

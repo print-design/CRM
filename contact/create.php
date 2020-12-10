@@ -58,6 +58,7 @@ include '../include/topscripts.php';
                             . 'inner join person p on c.person_id = p.id '
                             . 'inner join contact_result r on c.result_id = r.id where c.id='.$contact_id;
                     
+                    $conn->query('set names utf8');
                     $result_order = $conn->query($sql_order);
                     
                     if($result_order->num_rows > 0 && $row_order = $result_order->fetch_assoc()) {
@@ -68,6 +69,7 @@ include '../include/topscripts.php';
                     if($is_order > 0) {
                         $sql_order = "insert into _order (contact_id) values ($contact_id)";
                         
+                        $conn->query('set names utf8');
                         if($conn->query($sql_order) === true) {
                             $order_id = $conn->insert_id;
                             header('Location: '.APPLICATION.'/order/edit.php?id='.$order_id);
@@ -100,6 +102,7 @@ include '../include/topscripts.php';
         
         $sql = "select o.id organization_id, o.name organization, o.production, p.name person, p.position, p.phone, p.email from person p inner join organization o on p.organization_id = o.id where p.id=".$_GET['person'];
         
+        $conn->query('set names utf8');
         $result = $conn->query($sql);
         
         if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
@@ -160,6 +163,7 @@ include '../include/topscripts.php';
                                 if($conn->connect_error) {
                                     die('Ошибка соединения: ' . $conn->connect_error);
                                 }
+                                $conn->query('set names utf8');
                                 $result = $conn->query("select id, name from contact_result order by ordinal");
                                 if ($result->num_rows > 0) {
                                     while ($row = $result->fetch_assoc()) {

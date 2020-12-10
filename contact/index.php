@@ -40,6 +40,7 @@ include '../include/topscripts.php';
                                 die('Ошибка соединения: ' . $conn->connect_error);
                             }
                             
+                            $conn->query('set names utf8');
                             $result = $conn->query($sql);
                             if ($result->num_rows > 0) {
                                 while($row = $result->fetch_assoc()) {
@@ -101,6 +102,7 @@ include '../include/topscripts.php';
                                 . "and (select count(c1.id) from contact c1 inner join person p1 inner join organization o1 on p1.organization_id = o1.id on c1.person_id = p1.id where o1.id = o.id and c1.manager_id = c.manager_id and c1.id < c.id) = 0"
                                 . (isset($_GET['manager']) && $_GET['manager'] != '' ? " and c.manager_id=".$_GET['manager'] : "");
                         
+                        $conn->query('set names utf8');
                         $result = $conn->query($sql);
                         if ($result->num_rows > 0) {
                             if($row = $result->fetch_assoc()) {
@@ -122,6 +124,7 @@ include '../include/topscripts.php';
                                 . (isset($_GET['manager']) && $_GET['manager'] != '' ? "and c.manager_id=".$_GET['manager']." " : " ")
                                 . "order by id desc limit ".$pager_skip.", ".$pager_take;
                         
+                        $conn->query('set names utf8');
                         $result = $conn->query($sql);
                         if ($result->num_rows > 0) {
                             while($row = $result->fetch_assoc()) {
@@ -161,6 +164,7 @@ include '../include/topscripts.php';
                                 . "and r.efficient = 1 "
                                 . "and (select count(c1.id) from contact c1 inner join person p1 inner join organization o1 on p1.organization_id = o1.id on c1.person_id = p1.id where o1.id = o.id and c1.manager_id = c.manager_id and c1.id < c.id) = 0";
                         
+                        $conn->query('set names utf8');
                         $result = $conn->query($sql);
                         if ($result->num_rows > 0) {
                             if($row = $result->fetch_assoc()) {
@@ -180,6 +184,7 @@ include '../include/topscripts.php';
                                 . "and (select count(c1.id) from contact c1 inner join person p1 inner join organization o1 on p1.organization_id = o1.id on c1.person_id = p1.id where o1.id = o.id and c1.manager_id = c.manager_id and c1.id < c.id) = 0 "
                                 . "order by id desc limit ".$pager_skip.", ".$pager_take;
                         
+                        $conn->query('set names utf8');
                         $result = $conn->query($sql);
                         if ($result->num_rows > 0) {
                             while($row = $result->fetch_assoc()) {

@@ -50,6 +50,7 @@ include '../include/topscripts.php';
                 
                 $sql = "update _order set product='$product', number=$number, price=$price, shipment_date=$shipment_timestamp, contract_date=$contract_timestamp, bill_date=$bill_timestamp where id=$id";
                 
+                $conn->query('set names utf8');
                 if ($conn->query($sql) === true) {
                     header('Location: '.APPLICATION.'/order/details.php?id='.$id);
                 }
@@ -94,6 +95,8 @@ include '../include/topscripts.php';
         if($conn->connect_error) {
             die('Ошибка соединения: ' . $conn->connect_error);
         }
+        
+        $conn->query('set names utf8');
         $result = $conn->query($sql);
         if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
             $contact_date = $row['date'];

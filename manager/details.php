@@ -33,6 +33,7 @@ include '../include/topscripts.php';
                 
                 $sql = "insert into manager_role (manager_id, role_id) values ($manager_id, $role_id)";
                 
+                $conn->query('set names utf8');
                 if ($conn->query($sql) === true) {
                     header('Location: '.APPLICATION.'/manager/details.php?id='.$manager_id);
                 }
@@ -54,6 +55,7 @@ include '../include/topscripts.php';
             $role_id = $_POST['role_id'];
             $sql = "delete from manager_role where manager_id = $manager_id and role_id = $role_id";
             
+            $conn->query('set names utf8');
             if ($conn->query($sql) === true) {
                 header('Location: '.APPLICATION.'/manager/details.php?id='.$manager_id);
             }
@@ -81,6 +83,8 @@ include '../include/topscripts.php';
         if($conn->connect_error) {
             die('Ошибка соединения: ' . $conn->connect_error);
         }
+        
+        $conn->query('set names utf8');
         $result = $conn->query($sql);
         if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
             $username = $row['username'];
@@ -178,6 +182,7 @@ include '../include/topscripts.php';
                                 die('Ошибка соединения: ' . $conn->connect_error);
                             }
                             
+                            $conn->query('set names utf8');
                             $result = $conn->query($sql);
                             if ($result->num_rows > 0) {
                                 while($row = $result->fetch_assoc()) {

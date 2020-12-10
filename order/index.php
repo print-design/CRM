@@ -51,6 +51,7 @@ include '../include/topscripts.php';
                     
                     $sql = "select count(id) count from _order";
                     
+                    $conn->query('set names utf8');
                     $result = $conn->query($sql);
                     if ($result->num_rows > 0) {
                         if($row = $result->fetch_assoc()) {
@@ -69,6 +70,7 @@ include '../include/topscripts.php';
                             . "on o.contact_id = c.id "
                             . "order by o.id desc limit ".$pager_skip.",".$pager_take;
                     
+                    $conn->query('set names utf8');
                     $result = $conn->query($sql);
                     if ($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {

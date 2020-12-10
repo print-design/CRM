@@ -21,6 +21,8 @@ include '../include/topscripts.php';
         if($conn->connect_error) {
             die('Ошибка соединения: ' . $conn->connect_error);
         }
+        
+        $conn->query('set names utf8');
         $result = $conn->query($sql);
         if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
             $last_name = $row['last_name'];
@@ -63,6 +65,7 @@ include '../include/topscripts.php';
                 
                 $sql = "update manager set last_name='$last_name', first_name='$first_name', middle_name='$middle_name', username='$username' where id=". GetManagerId();
                 
+                $conn->query('set names utf8');
                 if ($conn->query($sql) === true) {
                     header('Location: '.APPLICATION.'/personal/');
                 }

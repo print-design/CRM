@@ -51,6 +51,7 @@ include '../include/topscripts.php';
                         . "values "
                         . "('$last_name', '$first_name', '$middle_name', '$username', password('$password'))";
                 
+                $conn->query('set names utf8');
                 if ($conn->query($sql) === true) {
                     header('Location: '.APPLICATION.'/manager/');
                 }

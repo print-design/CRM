@@ -40,6 +40,7 @@ include '../include/topscripts.php';
                         . "film_weight=$film_weight, film_price=$film_price, probability=$probability "
                         . "where id=$id";
                 
+                $conn->query('set names utf8');
                 if ($conn->query($sql) === true) {
                     header('Location: '.APPLICATION.'/organization/details.php?id='.$organization_id.'#perspective_planning');
                 }
@@ -78,6 +79,8 @@ include '../include/topscripts.php';
         if($conn->connect_error) {
             die('Ошибка соединения: ' . $conn->connect_error);
         }
+        
+        $conn->query('set names utf8');
         $result = $conn->query($sql);
         if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
             $organization_id = $row['organization_id'];
@@ -171,6 +174,7 @@ include '../include/topscripts.php';
                                             die('Ошибка соединения: ' . $conn->connect_error);
                                         }
                                         
+                                        $conn->query('set names utf8');
                                         $result = $conn->query($sql);
                                         if ($result->num_rows > 0) {
                                             while($row = $result->fetch_assoc()) {

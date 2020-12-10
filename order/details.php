@@ -43,6 +43,8 @@ include '../include/topscripts.php';
         if($conn->connect_error) {
             die('Ошибка соединения: ' . $conn->connect_error);
         }
+        
+        $conn->query('set names utf8');
         $result = $conn->query($sql);
         if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
             $contact_date = $row['date'];
@@ -167,6 +169,7 @@ include '../include/topscripts.php';
                         
                         $sql = "select id, date_format(date, '%d.%m.%Y') date, sum from payment where order_id = ".$_GET['id'];
                         
+                        $conn->query('set names utf8');
                         $result = $conn->query($sql);
                         if ($result->num_rows > 0) {
                             while($row = $result->fetch_assoc()) {

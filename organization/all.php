@@ -50,6 +50,7 @@ include '../include/topscripts.php';
                                         die('Ошибка соединения: ' . $conn->connect_error);
                                     }
                                     
+                                    $conn->query('set names utf8');
                                     $result = $conn->query($sql);
                                     if ($result->num_rows > 0) {
                                         while($row = $result->fetch_assoc()) {
@@ -98,6 +99,7 @@ include '../include/topscripts.php';
                             . $find
                             . $manager;
                     
+                    $conn->query('set names utf8');
                     $result = $conn->query($sql);
                     if ($result->num_rows > 0) {
                         if($row = $result->fetch_assoc()) {
@@ -111,7 +113,7 @@ include '../include/topscripts.php';
                             . $manager
                             . " order by id desc limit ".$pager_skip.",".$pager_take;
                     
-                    
+                    $conn->query('set names utf8');
                     $result = $conn->query($sql);
                     if ($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {

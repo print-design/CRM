@@ -32,6 +32,7 @@ include '../include/topscripts.php';
                 
                 $sql = "insert into film (name) values ('$name')";
                 
+                $conn->query('set names utf8');
                 if(!$conn->query($sql) === true) {
                     $error_message = $conn->error;
                 }
@@ -51,6 +52,7 @@ include '../include/topscripts.php';
             $id = $_POST['id'];
             $sql = "delete from film where id=$id";
             
+            $conn->query('set names utf8');
             if (!$conn->query($sql) === true) {
                 $error_message = $conn->error;
             }
@@ -103,6 +105,7 @@ include '../include/topscripts.php';
                         die('Ошибка соединения: ' . $conn->connect_error);
                     }
                     
+                    $conn->query('set names utf8');
                     $result = $conn->query($sql);
                     if ($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {

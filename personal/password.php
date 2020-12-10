@@ -41,6 +41,7 @@ include '../include/topscripts.php';
                 }
 
                 $sql = "select count(*) count from manager where id=". GetManagerId()." and password=password('".$_POST['old_password']."')";
+                $conn->query('set names utf8');
                 $result = $conn->query($sql);
                 if ($result->num_rows > 0) {
                     if($row = $result->fetch_assoc()) {

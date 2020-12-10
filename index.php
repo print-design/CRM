@@ -1,5 +1,5 @@
 <?php
-include '../include/topscripts.php';
+include 'include/topscripts.php';
 ?>
 <!DOCTYPE html>
 <!--

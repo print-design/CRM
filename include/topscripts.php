@@ -58,6 +58,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login_submit'])){
         if($conn->connect_error) {
             die('Ошибка соединения: ' . $conn->connect_error);
         }
+        
+        $conn->query('set names utf8');
         $result = $conn->query($sql);
         if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
             $login_manager_id = $row['id'];
@@ -81,6 +83,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login_submit'])){
         
         if($login_manager_id != '') {
             $role_sql = "select r.name from manager_role ur inner join role r on ur.role_id = r.id where ur.manager_id = ".$login_manager_id;
+            $conn->query('set names utf8');
             $role_result = $conn->query($role_sql);
             if($role_result->num_rows > 0) {
                 $roles = array();

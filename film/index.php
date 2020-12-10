@@ -1,3 +1,6 @@
+<?php
+include '../include/topscripts.php';
+?>
 <!DOCTYPE html>
 <html>
     <head>

@@ -1,6 +1,3 @@
-<?php
-
-?>
 <meta charset="UTF-8">
 <title>Принт-дизайн. Управление взаимоотношениями с клиентами</title>
 <link href="<?=APPLICATION ?>/css/bootstrap.css" rel="stylesheet" rel="stylesheet" />

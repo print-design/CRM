@@ -1,77 +1,77 @@
 <?php
 include '../include/topscripts.php';
+
+// Если нет параметра id, переходим к списку предпиятий
+if(!isset($_GET['id'])) {
+    header('Location: '.APPLICATION.'/organization/');
+}
+        
+// Валидация формы
+define('ISINVALID', ' is-invalid');
+$form_valid = true;
+$error_message = '';
+        
+$name_valid = '';
+        
+// Обработка отправки формы
+if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['person_create_submit'])) {
+    if($_POST['name'] == '') {
+        $name_valid = ISINVALID;
+        $form_valid = false;
+    }
+            
+    if($form_valid) {
+        $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+        if($conn->connect_error) {
+            die('Ошибка соединения: '.$conn->connect_error);
+        }
+                
+        $organization_id = $_POST['organization_id'];
+        $name = addslashes($_POST['name']);
+        $position = addslashes($_POST['position']);
+        $phone = addslashes($_POST['phone']);
+        $email = addslashes($_POST['email']);
+                
+        $sql = "insert into person (organization_id, name, position, phone, email) values ($organization_id, '$name', '$position', '$phone', '$email')";
+                
+        $conn->query('set names utf8');
+        if ($conn->query($sql) === true) {
+            header('Location: '.APPLICATION.'/organization/details.php?id='.$organization_id);
+        }
+        else {
+            $error_message = $conn->error;
+        }
+                
+        $conn->close();
+    }
+}
+        
+// Получение предприятия
+$organization_id = '';
+$organization_name = '';
+        
+$conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+$sql = "select id, name 
+    from organization 
+    where id=".$_GET['id'];
+        
+if($conn->connect_error) {
+    die('Ошибка соединения: ' . $conn->connect_error);
+}
+        
+$conn->query('set names utf8');
+$result = $conn->query($sql);
+if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
+    $organization_id = $row['id'];
+    $organization_name = $row['name'];
+}
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html>
     <head>
         <?php
         include '../include/head.php';
-        
-        // Если нет параметра id, переходим к списку предпиятий
-        if(!isset($_GET['id'])) {
-            header('Location: '.APPLICATION.'/organization/');
-        }
-        
-        // Валидация формы
-        define('ISINVALID', ' is-invalid');
-        $form_valid = true;
-        $error_message = '';
-        
-        $name_valid = '';
-        
-        // Обработка отправки формы
-        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['person_create_submit'])) {
-            if($_POST['name'] == '') {
-                $name_valid = ISINVALID;
-                $form_valid = false;
-            }
-            
-            if($form_valid) {
-                $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-                if($conn->connect_error) {
-                    die('Ошибка соединения: '.$conn->connect_error);
-                }
-                
-                $organization_id = $_POST['organization_id'];
-                $name = addslashes($_POST['name']);
-                $position = addslashes($_POST['position']);
-                $phone = addslashes($_POST['phone']);
-                $email = addslashes($_POST['email']);
-                
-                $sql = "insert into person (organization_id, name, position, phone, email) values ($organization_id, '$name', '$position', '$phone', '$email')";
-                
-                $conn->query('set names utf8');
-                if ($conn->query($sql) === true) {
-                    header('Location: '.APPLICATION.'/organization/details.php?id='.$organization_id);
-                }
-                else {
-                    $error_message = $conn->error;
-                }
-                
-                $conn->close();
-            }
-        }
-        
-        // Получение предприятия
-        $organization_id = '';
-        $organization_name = '';
-        
-        $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-        $sql = "select id, name 
-            from organization 
-            where id=".$_GET['id'];
-        
-        if($conn->connect_error) {
-            die('Ошибка соединения: ' . $conn->connect_error);
-        }
-        
-        $conn->query('set names utf8');
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
-            $organization_id = $row['id'];
-            $organization_name = $row['name'];
-        }
-        $conn->close();
         ?>
     </head>
     <body>
@@ -81,9 +81,7 @@ include '../include/topscripts.php';
         <div class="container-fluid">
             <?php
             if(isset($error_message) && $error_message != '') {
-               echo <<<ERROR
-               <div class="alert alert-danger">$error_message</div>
-               ERROR;
+               echo "<div class='alert alert-danger'>$error_message</div>";
             }
             ?>
             <div class="col-12 col-md-6">

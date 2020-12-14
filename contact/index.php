@@ -1,12 +1,12 @@
 <?php
 include '../include/topscripts.php';
+include '../include/restrict_logged_in.php';
 ?>
 <!DOCTYPE html>
 <html>
     <head>
         <?php
         include '../include/head.php';
-        include '../include/restrict_logged_in.php';
         ?>
     </head>
     <body>
@@ -17,9 +17,7 @@ include '../include/topscripts.php';
         <div class="container-fluid">
             <?php
             if(isset($error_message) && $error_message != '') {
-               echo <<<ERROR
-               <div class="alert alert-danger">$error_message</div>
-               ERROR;
+               echo "<div class='alert alert-danger'>$error_message</div>";
             }
             
             if(IsInRole('admin')) {

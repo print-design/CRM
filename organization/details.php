@@ -1,98 +1,98 @@
 <?php
 include '../include/topscripts.php';
+include '../include/restrict_logged_in.php';
+        
+if(IsInRole('admin')) {
+    // Смена менеджера
+    if($_SERVER['REQUEST_METHOD'] == 'POST'
+        && isset($_POST['change_manager_submit'])
+        && isset($_POST['manager_id']) && $_POST['manager_id'] != ''
+        && isset($_POST['id']) && $_POST['id'] != '') {
+                
+    $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+                
+    if($conn->connect_error) {
+        die('Ошибка соединения: '.$conn->connect_error);
+    }
+                
+    $id = $_POST['id'];
+    $manager_id = $_POST['manager_id'];
+                
+    $sql = "update organization set manager_id=$manager_id where id=$id";
+                
+    $conn->query('set names utf8');
+    if ($conn->query($sql) === true) {
+        header('Location: '.APPLICATION.'/organization/details.php?id='.$id);
+    }
+    else {
+        $error_message = $conn->error;
+    }
+                
+    $conn->close();
+    }
+}
+        
+// Удаление перспективного планирования
+if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_perspective_planning_submit'])) {
+    $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+            
+    if($conn->connect_error) {
+        die('Ошибка соединения: '.$conn->connect_error);
+    }
+            
+    $id = $_POST['id'];
+    $sql = "delete from perspective_planning where id=$id";
+            
+    $conn->query('set names utf8');
+    if (!$conn->query($sql) === true) {
+        $error_message = $conn->error;
+    }
+            
+    $conn->close();
+}
+        
+// Если нет параметра id, переход к списку
+if(!isset($_GET['id'])) {
+    header('Location: '.APPLICATION.'/organization/');
+}
+        
+// Получение объекта
+$date = '';
+$name = '';
+$production = '';
+$address = '';
+$manager_id = '';
+$last_name = '';
+$first_name = '';
+$middle_name = '';
+        
+$conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+$sql = "select date_format(o.date, '%d.%m.%Y') date, o.name, o.production, o.address, o.manager_id, m.last_name, m.first_name, m.middle_name 
+    from organization o inner join manager m on o.manager_id = m.id where o.id=".$_GET['id'];
+        
+if($conn->connect_error) {
+    die('Ошибка соединения: ' . $conn->connect_error);
+}
+        
+$conn->query('set names utf8');
+$result = $conn->query($sql);
+if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
+    $date = $row['date'];
+    $name = $row['name'];
+    $production = $row['production'];
+    $address = $row['address'];
+    $manager_id = $row['manager_id'];
+    $last_name = $row['last_name'];
+    $first_name = $row['first_name'];
+    $middle_name = $row['middle_name'];
+}
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html>
     <head>
         <?php
         include '../include/head.php';
-        include '../include/restrict_logged_in.php';
-        
-        if(IsInRole('admin')) {
-            // Смена менеджера
-            if($_SERVER['REQUEST_METHOD'] == 'POST'
-                    && isset($_POST['change_manager_submit'])
-                    && isset($_POST['manager_id']) && $_POST['manager_id'] != ''
-                    && isset($_POST['id']) && $_POST['id'] != '') {
-                
-                $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-                
-                if($conn->connect_error) {
-                    die('Ошибка соединения: '.$conn->connect_error);
-                }
-                
-                $id = $_POST['id'];
-                $manager_id = $_POST['manager_id'];
-                
-                $sql = "update organization set manager_id=$manager_id where id=$id";
-                
-                $conn->query('set names utf8');
-                if ($conn->query($sql) === true) {
-                    header('Location: '.APPLICATION.'/organization/details.php?id='.$id);
-                }
-                else {
-                    $error_message = $conn->error;
-                }
-                
-                $conn->close();
-            }
-        }
-        
-        // Удаление перспективного планирования
-        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_perspective_planning_submit'])) {
-            $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-            
-            if($conn->connect_error) {
-                die('Ошибка соединения: '.$conn->connect_error);
-            }
-            
-            $id = $_POST['id'];
-            $sql = "delete from perspective_planning where id=$id";
-            
-            $conn->query('set names utf8');
-            if (!$conn->query($sql) === true) {
-                $error_message = $conn->error;
-            }
-            
-            $conn->close();
-        }
-        
-        // Если нет параметра id, переход к списку
-        if(!isset($_GET['id'])) {
-            header('Location: '.APPLICATION.'/organization/');
-        }
-        
-        // Получение объекта
-        $date = '';
-        $name = '';
-        $production = '';
-        $address = '';
-        $manager_id = '';
-        $last_name = '';
-        $first_name = '';
-        $middle_name = '';
-        
-        $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-        $sql = "select date_format(o.date, '%d.%m.%Y') date, o.name, o.production, o.address, o.manager_id, m.last_name, m.first_name, m.middle_name 
-            from organization o inner join manager m on o.manager_id = m.id where o.id=".$_GET['id'];
-        
-        if($conn->connect_error) {
-            die('Ошибка соединения: ' . $conn->connect_error);
-        }
-        
-        $conn->query('set names utf8');
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
-            $date = $row['date'];
-            $name = $row['name'];
-            $production = $row['production'];
-            $address = $row['address'];
-            $manager_id = $row['manager_id'];
-            $last_name = $row['last_name'];
-            $first_name = $row['first_name'];
-            $middle_name = $row['middle_name'];
-        }
-        $conn->close();
         ?>
     </head>
     <body>
@@ -102,9 +102,7 @@ include '../include/topscripts.php';
         <div class="container-fluid">
             <?php
             if(isset($error_message) && $error_message != '') {
-               echo <<<ERROR
-               <div class="alert alert-danger">$error_message</div>
-               ERROR;
+               echo "<div class='alert alert-danger'>$error_message</div>";
             }
             ?>
             <div class="row">

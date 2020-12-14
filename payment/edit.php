@@ -1,111 +1,109 @@
 <?php
 include '../include/topscripts.php';
+include '../include/restrict_accountant.php';
+
+// Валидация формы
+define('ISINVALID', ' is-invalid');
+$form_valid = true;
+$error_message = '';
+        
+$date_valid = '';
+$sum_valid = '';
+        
+// Обработка отправки формы
+if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_payment_submit'])) {
+    if($_POST['date'] == '') {
+        $date_valid = ISINVALID;
+        $form_valid = false;
+    }
+            
+    if($_POST['sum'] == '' || is_nan($_POST['sum'])) {
+        $sum_valid = ISINVALID;
+        $form_valid = false;
+    }
+            
+    if($form_valid) {
+        $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+        if($conn->connect_error) {
+            die('Ошибка соединения: '.$conn->connect_error);
+        }
+
+        $id = $_POST['id'];
+        $order_id = $_POST['order_id'];
+        $sum = $_POST['sum'];
+        $date = $_POST['date'] == '' ? 'NULL' : DateTime::createFromFormat("d.m.Y", $_POST['date']);
+        $timestamp = $_POST['date'] == '' ? 'NULL' : "from_unixtime(".$date->gettimestamp().")";
+                
+        $sql = "update payment set date=$timestamp, sum=$sum where id = ".$id;
+                
+        $conn->query('set names utf8');
+        if ($conn->query($sql) === true) {
+            header('Location: '.APPLICATION.'/order/details.php?id='.$order_id);
+        }
+        else {
+            $error_message = $conn->error;
+        }
+                
+        $conn->close();
+    }
+}
+        
+// Если нет параметра id, переход к списку
+if(!isset($_GET['id'])) {
+    header('Location: '.APPLICATION.'/order/');
+}
+        
+// Получение заказа и оплаты
+$order_id = '';
+$contact_date = '';
+$organization = '';
+$last_name = '';
+$first_name = '';
+$middle_name = '';
+$product = '';
+$number = '';
+$price = '';
+        
+$conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+$sql = "select o.id, date_format(c.date, '%d.%m.%Y') contact_date, org.name organization, m.last_name, m.first_name, m.middle_name, "
+        . "o.product, o.number, o.price, date_format(p.date, '%d.%m.%Y') date, p.sum "
+        . "from _order o "
+        . "left join contact c "
+        . "left join manager m on c.manager_id = m.id "
+        . "left join phone ph left join organization org on ph.organization_id = org.id "
+        . "on c.phone_id = ph.id "
+        . "on o.contact_id = c.id "
+        . "inner join payment p on p.order_id = o.id "
+        . "where p.id=".$_GET['id'];
+        
+if($conn->connect_error) {
+    die('Ошибка соединения: ' . $conn->connect_error);
+}
+        
+$conn->query('set names utf8');
+$result = $conn->query($sql);
+if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
+    $order_id = $row['id'];
+    $contact_date = $row['date'];
+    $organization = $row['organization'];
+    $last_name = $row['last_name'];
+    $first_name = $row['first_name'];
+    $middle_name = $row['middle_name'];
+    $product = $row['product'];
+    $number = $row['number'];
+    $price = $row['price'];
+    $date = $row['date'];
+    $sum = $row['sum'];
+}
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html>
     <head>
         <?php
         include '../include/head.php';
-        include '../include/restrict_accountant.php';
         ?>
         <link href="<?=APPLICATION ?>/css/jquery-ui.css" rel="stylesheet"/>
-        
-        <?php
-        // Валидация формы
-        define('ISINVALID', ' is-invalid');
-        $form_valid = true;
-        $error_message = '';
-        
-        $date_valid = '';
-        $sum_valid = '';
-        
-        // Обработка отправки формы
-        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_payment_submit'])) {
-            if($_POST['date'] == '') {
-                $date_valid = ISINVALID;
-                $form_valid = false;
-            }
-            
-            if($_POST['sum'] == '' || is_nan($_POST['sum'])) {
-                $sum_valid = ISINVALID;
-                $form_valid = false;
-            }
-            
-            if($form_valid) {
-                $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-                if($conn->connect_error) {
-                    die('Ошибка соединения: '.$conn->connect_error);
-                }
-
-                $id = $_POST['id'];
-                $order_id = $_POST['order_id'];
-                $sum = $_POST['sum'];
-                $date = $_POST['date'] == '' ? 'NULL' : DateTime::createFromFormat("d.m.Y", $_POST['date']);
-                $timestamp = $_POST['date'] == '' ? 'NULL' : "from_unixtime(".$date->gettimestamp().")";
-                
-                $sql = "update payment set date=$timestamp, sum=$sum where id = ".$id;
-                
-                $conn->query('set names utf8');
-                if ($conn->query($sql) === true) {
-                    header('Location: '.APPLICATION.'/order/details.php?id='.$order_id);
-                }
-                else {
-                    $error_message = $conn->error;
-                }
-                
-                $conn->close();
-            }
-        }
-        
-        // Если нет параметра id, переход к списку
-        if(!isset($_GET['id'])) {
-            header('Location: '.APPLICATION.'/order/');
-        }
-        
-        // Получение заказа и оплаты
-        $order_id = '';
-        $contact_date = '';
-        $organization = '';
-        $last_name = '';
-        $first_name = '';
-        $middle_name = '';
-        $product = '';
-        $number = '';
-        $price = '';
-        
-        $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-        $sql = "select o.id, date_format(c.date, '%d.%m.%Y') contact_date, org.name organization, m.last_name, m.first_name, m.middle_name, "
-                . "o.product, o.number, o.price, date_format(p.date, '%d.%m.%Y') date, p.sum "
-                . "from _order o "
-                . "left join contact c "
-                . "left join manager m on c.manager_id = m.id "
-                . "left join phone ph left join organization org on ph.organization_id = org.id "
-                . "on c.phone_id = ph.id "
-                . "on o.contact_id = c.id "
-                . "inner join payment p on p.order_id = o.id "
-                . "where p.id=".$_GET['id'];
-        
-        if($conn->connect_error) {
-            die('Ошибка соединения: ' . $conn->connect_error);
-        }
-        
-        $conn->query('set names utf8');
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
-            $order_id = $row['id'];
-            $contact_date = $row['date'];
-            $organization = $row['organization'];
-            $last_name = $row['last_name'];
-            $first_name = $row['first_name'];
-            $middle_name = $row['middle_name'];
-            $product = $row['product'];
-            $number = $row['number'];
-            $price = $row['price'];
-            $date = $row['date'];
-            $sum = $row['sum'];
-        }
-        $conn->close();
-        ?>
     </head>
     <body>
         <?php

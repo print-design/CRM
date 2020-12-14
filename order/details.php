@@ -1,66 +1,66 @@
 <?php
 include '../include/topscripts.php';
+include '../include/restrict_logged_in.php';
+        
+// Если нет параметра id, переход к списку
+if(!isset($_GET['id'])) {
+    header('Location: '.APPLICATION.'/order/');
+}
+        
+// Получение объекта
+$contact_date = '';
+$organization = '';
+$last_name = '';
+$first_name = '';
+$middle_name = '';
+$product = '';
+$number = '';
+$price = '';
+$shipment_date = '';
+$contract_date = '';
+$bill_date = '';
+$total_payment = '';
+        
+$conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+$sql = "select date_format(c.date, '%d.%m.%Y') date, org.name organization, m.last_name, m.first_name, m.middle_name, "
+        . "o.product, o.number, o.price, "
+        . "date_format(o.shipment_date, '%d.%m.%Y') shipment_date, date_format(o.contract_date, '%d.%m.%Y') contract_date, date_format(o.bill_date, '%d.%m.%Y') bill_date, "
+        . "(select sum(sum) from payment where order_id = o.id) as total_payment "
+        . "from _order o "
+        . "left join contact c "
+        . "left join manager m on c.manager_id = m.id "
+        . "left join person p left join organization org on p.organization_id = org.id "
+        . "on c.person_id = p.id "
+        . "on o.contact_id = c.id "
+        . "where o.id=".$_GET['id'];
+        
+if($conn->connect_error) {
+    die('Ошибка соединения: ' . $conn->connect_error);
+}
+        
+$conn->query('set names utf8');
+$result = $conn->query($sql);
+if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
+    $contact_date = $row['date'];
+    $organization = $row['organization'];
+    $last_name = $row['last_name'];
+    $first_name = $row['first_name'];
+    $middle_name = $row['middle_name'];
+    $product = $row['product'];
+    $number = $row['number'];
+    $price = $row['price'];
+    $shipment_date = $row['shipment_date'];
+    $contract_date = $row['contract_date'];
+    $bill_date = $row['bill_date'];
+    $total_payment = $row['total_payment'];
+}
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html>
     <head>
         <?php
         include '../include/head.php';
-        include '../include/restrict_logged_in.php';
-        
-        // Если нет параметра id, переход к списку
-        if(!isset($_GET['id'])) {
-            header('Location: '.APPLICATION.'/order/');
-        }
-        
-        // Получение объекта
-        $contact_date = '';
-        $organization = '';
-        $last_name = '';
-        $first_name = '';
-        $middle_name = '';
-        $product = '';
-        $number = '';
-        $price = '';
-        $shipment_date = '';
-        $contract_date = '';
-        $bill_date = '';
-        $total_payment = '';
-        
-        $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-        $sql = "select date_format(c.date, '%d.%m.%Y') date, org.name organization, m.last_name, m.first_name, m.middle_name, "
-                . "o.product, o.number, o.price, "
-                . "date_format(o.shipment_date, '%d.%m.%Y') shipment_date, date_format(o.contract_date, '%d.%m.%Y') contract_date, date_format(o.bill_date, '%d.%m.%Y') bill_date, "
-                . "(select sum(sum) from payment where order_id = o.id) as total_payment "
-                . "from _order o "
-                . "left join contact c "
-                . "left join manager m on c.manager_id = m.id "
-                . "left join person p left join organization org on p.organization_id = org.id "
-                . "on c.person_id = p.id "
-                . "on o.contact_id = c.id "
-                . "where o.id=".$_GET['id'];
-        
-        if($conn->connect_error) {
-            die('Ошибка соединения: ' . $conn->connect_error);
-        }
-        
-        $conn->query('set names utf8');
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
-            $contact_date = $row['date'];
-            $organization = $row['organization'];
-            $last_name = $row['last_name'];
-            $first_name = $row['first_name'];
-            $middle_name = $row['middle_name'];
-            $product = $row['product'];
-            $number = $row['number'];
-            $price = $row['price'];
-            $shipment_date = $row['shipment_date'];
-            $contract_date = $row['contract_date'];
-            $bill_date = $row['bill_date'];
-            $total_payment = $row['total_payment'];
-        }
-        $conn->close();
         ?>
     </head>
     <body>
@@ -70,9 +70,7 @@ include '../include/topscripts.php';
         <div class="container-fluid">
             <?php
             if(isset($error_message) && $error_message != '') {
-               echo <<<ERROR
-               <div class="alert alert-danger">$error_message</div>
-               ERROR;
+               echo "<div class='alert alert-danger'>$error_message</div>";
             }
             ?>
             <div class="row">

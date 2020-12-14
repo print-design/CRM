@@ -1,82 +1,81 @@
 <?php
 include '../include/topscripts.php';
+include '../include/restrict_logged_in.php';
+        
+// Валидация формы
+define('ISINVALID', ' is-invalid');
+$form_valid = true;
+$error_message = '';
+        
+$name_valid = '';
+        
+// Обработка отправки формы
+if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['organization_edit_submit'])) {
+    if($_POST['name'] == '') {
+        $name_valid = ISINVALID;
+        $form_valid = false;
+    }
+            
+    if($form_valid) {
+        $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+        if($conn->connect_error) {
+            die('Ошибка соединения: '.$conn->connect_error);
+        }
+                
+        $id = $_POST['id'];
+        $name = addslashes($_POST['name']);
+        $production = addslashes($_POST['production']);
+        $address = addslashes($_POST['address']);
+                
+        $sql = "update organization set name='$name', production='$production', address='$address' where id=$id";
+                
+        $conn->query('set names utf8');
+        if ($conn->query($sql) === true) {
+            header('Location: '.APPLICATION.'/organization/details.php?id='.$id);
+        }
+        else {
+            $error_message = $conn->error;
+        }
+                
+        $conn->close();
+    }
+}
+        
+// Если нет параметра id, переход к списку
+if(!isset($_GET['id'])) {
+    header('Location: '.APPLICATION.'/organization/');
+}
+        
+// Получение объекта
+$date = '';
+$name = '';
+$production = '';
+$address = '';
+$email = '';
+        
+$conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+$sql = "select date, name, production, address 
+    from organization where id=".$_GET['id'];
+        
+if($conn->connect_error) {
+    die('Ошибка соединения: ' . $conn->connect_error);
+}
+        
+$conn->query('set names utf8');
+$result = $conn->query($sql);
+if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
+    $date = $row['date'];
+    $name = $row['name'];
+    $production = $row['production'];
+    $address = $row['address'];
+}
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html>
     <head>
         <?php
         include '../include/head.php';
-        include '../include/restrict_logged_in.php';
-        
-        // Валидация формы
-        define('ISINVALID', ' is-invalid');
-        $form_valid = true;
-        $error_message = '';
-        
-        $name_valid = '';
-        
-        // Обработка отправки формы
-        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['organization_edit_submit'])) {
-            if($_POST['name'] == '') {
-                $name_valid = ISINVALID;
-                $form_valid = false;
-            }
-            
-            if($form_valid) {
-                $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-                if($conn->connect_error) {
-                    die('Ошибка соединения: '.$conn->connect_error);
-                }
-                
-                $id = $_POST['id'];
-                $name = addslashes($_POST['name']);
-                $production = addslashes($_POST['production']);
-                $address = addslashes($_POST['address']);
-                
-                $sql = "update organization set name='$name', production='$production', address='$address' where id=$id";
-                
-                
-                $conn->query('set names utf8');
-                if ($conn->query($sql) === true) {
-                    header('Location: '.APPLICATION.'/organization/details.php?id='.$id);
-                }
-                else {
-                    $error_message = $conn->error;
-                }
-                
-                $conn->close();
-            }
-        }
-        
-        // Если нет параметра id, переход к списку
-        if(!isset($_GET['id'])) {
-            header('Location: '.APPLICATION.'/organization/');
-        }
-        
-        // Получение объекта
-        $date = '';
-        $name = '';
-        $production = '';
-        $address = '';
-        $email = '';
-        
-        $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-        $sql = "select date, name, production, address 
-            from organization where id=".$_GET['id'];
-        
-        if($conn->connect_error) {
-            die('Ошибка соединения: ' . $conn->connect_error);
-        }
-        
-        $conn->query('set names utf8');
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
-            $date = $row['date'];
-            $name = $row['name'];
-            $production = $row['production'];
-            $address = $row['address'];
-        }
-        $conn->close();
         ?>
     </head>
     <body>
@@ -86,9 +85,7 @@ include '../include/topscripts.php';
         <div class="container-fluid">
             <?php
             if(isset($error_message) && $error_message != '') {
-               echo <<<ERROR
-               <div class="alert alert-danger">$error_message</div>
-               ERROR;
+               echo "<div class='alert alert-danger'>$error_message</div>";
             }
             ?>
             <div class="row">

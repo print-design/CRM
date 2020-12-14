@@ -1,64 +1,64 @@
 <?php
 include '../include/topscripts.php';
+include '../include/restrict_admin.php';
+        
+// Валидация формы
+define('ISINVALID', ' is-invalid');
+$form_valid = true;
+$error_message = '';
+        
+$first_name_valid = '';
+        
+// Обработка отправки формы
+if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['film_type_submit'])) {
+    if($_POST['name'] == '') {
+        $name_valid = ISINVALID;
+        $form_valid = false;
+    }
+            
+    if($form_valid) {
+        $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+        if($conn->connect_error) {
+            die('Ошибка соединения: '.$conn->connect_error);
+        }
+                
+        $name = addslashes($_POST['name']);
+                
+        $sql = "insert into film (name) values ('$name')";
+                
+        $conn->query('set names utf8');
+        if(!$conn->query($sql) === true) {
+            $error_message = $conn->error;
+        }
+                
+        $conn->close();
+    }
+}
+        
+// Удаление типа пленки
+if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film_submit'])) {
+    $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+            
+    if($conn->connect_error) {
+        die('Ошибка соединения: '.$conn->connect_error);
+    }
+            
+    $id = $_POST['id'];
+    $sql = "delete from film where id=$id";
+            
+    $conn->query('set names utf8');
+    if (!$conn->query($sql) === true) {
+        $error_message = $conn->error;
+    }
+            
+    $conn->close();
+}
 ?>
 <!DOCTYPE html>
 <html>
     <head>
         <?php
         include '../include/head.php';
-        include '../include/restrict_admin.php';
-        
-        // Валидация формы
-        define('ISINVALID', ' is-invalid');
-        $form_valid = true;
-        $error_message = '';
-        
-        $first_name_valid = '';
-        
-        // Обработка отправки формы
-        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['film_type_submit'])) {
-            if($_POST['name'] == '') {
-                $name_valid = ISINVALID;
-                $form_valid = false;
-            }
-            
-            if($form_valid) {
-                $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-                if($conn->connect_error) {
-                    die('Ошибка соединения: '.$conn->connect_error);
-                }
-                
-                $name = addslashes($_POST['name']);
-                
-                $sql = "insert into film (name) values ('$name')";
-                
-                $conn->query('set names utf8');
-                if(!$conn->query($sql) === true) {
-                    $error_message = $conn->error;
-                }
-                
-                $conn->close();
-            }
-        }
-        
-        // Удаление типа пленки
-        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film_submit'])) {
-            $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-            
-            if($conn->connect_error) {
-                die('Ошибка соединения: '.$conn->connect_error);
-            }
-            
-            $id = $_POST['id'];
-            $sql = "delete from film where id=$id";
-            
-            $conn->query('set names utf8');
-            if (!$conn->query($sql) === true) {
-                $error_message = $conn->error;
-            }
-            
-            $conn->close();
-        }
         ?>
     </head>
     <body>

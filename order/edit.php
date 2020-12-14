@@ -1,118 +1,116 @@
 <?php
 include '../include/topscripts.php';
+include '../include/restrict_logged_in.php';
+       
+// Валидация формы
+define('ISINVALID', ' is-invalid');
+$form_valid = true;
+$error_message = '';
+        
+$number_valid = '';
+$price_valid = '';
+        
+// Обработка отправки формы
+if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['order_edit_submit'])) {
+    if($_POST['number'] != '' && !is_numeric($_POST['number'])) {
+        $number_valid = ISINVALID;
+        $form_valid = false;
+    }
+            
+    if($_POST['price'] != '' && is_nan($_POST['price'])) {
+        $price_valid = ISINVALID;
+        $form_valid = false;
+    }
+            
+    if($form_valid) {
+        $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+        if($conn->connect_error) {
+            die('Ошибка соединения: '.$conn->connect_error);
+        }
+                
+        $id = $_POST['id'];
+        $product = addslashes($_POST['product']);
+        $number = $_POST['number'] == '' ? 'NULL' : $_POST['number'];
+        $price = $_POST['price'] == '' ? 'NULL' : $_POST['price'];
+        $shipment_date = $_POST['shipment_date'] == '' ? 'NULL' : DateTime::createFromFormat("d.m.Y", $_POST['shipment_date']);
+        $shipment_timestamp = $_POST['shipment_date'] == '' ? 'NULL' : "from_unixtime(".$shipment_date->gettimestamp().")";
+        $contract_date = $_POST['contract_date'] == '' ? 'NULL' : DateTime::createFromFormat("d.m.Y", $_POST['contract_date']);
+        $contract_timestamp = $_POST['contract_date'] == '' ? 'NULL' : "from_unixtime(".$contract_date->gettimestamp().")";
+        $bill_date = $_POST['bill_date'] == '' ? 'NULL' : DateTime::createFromFormat("d.m.Y", $_POST['bill_date']);
+        $bill_timestamp = $_POST['bill_date'] == '' ? 'NULL' : "from_unixtime(".$bill_date->gettimestamp().")";
+                
+        $sql = "update _order set product='$product', number=$number, price=$price, shipment_date=$shipment_timestamp, contract_date=$contract_timestamp, bill_date=$bill_timestamp where id=$id";
+                
+        $conn->query('set names utf8');
+        if ($conn->query($sql) === true) {
+            header('Location: '.APPLICATION.'/order/details.php?id='.$id);
+        }
+        else {
+            $error_message = $conn->error;
+        }
+                
+        $conn->close();
+    }
+}
+        
+// Если нет параметра id, переход к списку
+if(!isset($_GET['id'])) {
+    header('Location; '.APPLICATION.'/order/');
+}
+        
+// Получение объекта
+$contact_date = '';
+$organization = '';
+$last_name = '';
+$first_name = '';
+$middle_name = '';
+$product = '';
+$number = '';
+$price = '';
+$shipment_date = '';
+$contract_date = '';
+$bill_date = '';
+        
+$conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+$sql = "select date_format(c.date, '%d.%m.%Y') date, org.name organization, m.last_name, m.first_name, m.middle_name, "
+        . "o.product, o.number, o.price, "
+        . "date_format(o.shipment_date, '%d.%m.%Y') shipment_date, date_format(o.contract_date, '%d.%m.%Y') contract_date, date_format(o.bill_date, '%d.%m.%Y') bill_date "
+        . "from _order o "
+        . "left join contact c "
+        . "left join manager m on c.manager_id = m.id "
+        . "left join person p left join organization org on p.organization_id = org.id "
+        . "on c.person_id = p.id "
+        . "on o.contact_id = c.id "
+        . "where o.id=".$_GET['id'];
+        
+if($conn->connect_error) {
+    die('Ошибка соединения: ' . $conn->connect_error);
+}
+        
+$conn->query('set names utf8');
+$result = $conn->query($sql);
+if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
+    $contact_date = $row['date'];
+    $organization = $row['organization'];
+    $last_name = $row['last_name'];
+    $first_name = $row['first_name'];
+    $middle_name = $row['middle_name'];
+    $product = $row['product'];
+    $number = $row['number'];
+    $price = $row['price'];
+    $shipment_date = $row['shipment_date'];
+    $contract_date = $row['contract_date'];
+    $bill_date = $row['bill_date'];
+}
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html>
     <head>
         <?php
         include '../include/head.php';
-        include '../include/restrict_logged_in.php';
         ?>
         <link href="<?=APPLICATION ?>/css/jquery-ui.css" rel="stylesheet"/>
-        
-        <?php
-        // Валидация формы
-        define('ISINVALID', ' is-invalid');
-        $form_valid = true;
-        $error_message = '';
-        
-        $number_valid = '';
-        $price_valid = '';
-        
-        // Обработка отправки формы
-        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['order_edit_submit'])) {
-            if($_POST['number'] != '' && !is_numeric($_POST['number'])) {
-                $number_valid = ISINVALID;
-                $form_valid = false;
-            }
-            
-            if($_POST['price'] != '' && is_nan($_POST['price'])) {
-                $price_valid = ISINVALID;
-                $form_valid = false;
-            }
-            
-            if($form_valid) {
-                $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-                if($conn->connect_error) {
-                    die('Ошибка соединения: '.$conn->connect_error);
-                }
-                
-                $id = $_POST['id'];
-                $product = addslashes($_POST['product']);
-                $number = $_POST['number'];
-                $price = $_POST['price'];
-                $shipment_date = $_POST['shipment_date'] == '' ? 'NULL' : DateTime::createFromFormat("d.m.Y", $_POST['shipment_date']);
-                $shipment_timestamp = $_POST['shipment_date'] == '' ? 'NULL' : "from_unixtime(".$shipment_date->gettimestamp().")";
-                $contract_date = $_POST['contract_date'] == '' ? 'NULL' : DateTime::createFromFormat("d.m.Y", $_POST['contract_date']);
-                $contract_timestamp = $_POST['contract_date'] == '' ? 'NULL' : "from_unixtime(".$contract_date->gettimestamp().")";
-                $bill_date = $_POST['bill_date'] == '' ? 'NULL' : DateTime::createFromFormat("d.m.Y", $_POST['bill_date']);
-                $bill_timestamp = $_POST['bill_date'] == '' ? 'NULL' : "from_unixtime(".$bill_date->gettimestamp().")";
-                
-                $sql = "update _order set product='$product', number=$number, price=$price, shipment_date=$shipment_timestamp, contract_date=$contract_timestamp, bill_date=$bill_timestamp where id=$id";
-                
-                $conn->query('set names utf8');
-                if ($conn->query($sql) === true) {
-                    header('Location: '.APPLICATION.'/order/details.php?id='.$id);
-                }
-                else {
-                    $error_message = $conn->error;
-                }
-                
-                $conn->close();
-            }
-        }
-        
-        // Если нет параметра id, переход к списку
-        if(!isset($_GET['id'])) {
-            header('Location; '.APPLICATION.'/order/');
-        }
-        
-        // Получение объекта
-        $contact_date = '';
-        $organization = '';
-        $last_name = '';
-        $first_name = '';
-        $middle_name = '';
-        $product = '';
-        $number = '';
-        $price = '';
-        $shipment_date = '';
-        $contract_date = '';
-        $bill_date = '';
-        
-        $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-        $sql = "select date_format(c.date, '%d.%m.%Y') date, org.name organization, m.last_name, m.first_name, m.middle_name, "
-                . "o.product, o.number, o.price, "
-                . "date_format(o.shipment_date, '%d.%m.%Y') shipment_date, date_format(o.contract_date, '%d.%m.%Y') contract_date, date_format(o.bill_date, '%d.%m.%Y') bill_date "
-                . "from _order o "
-                . "left join contact c "
-                . "left join manager m on c.manager_id = m.id "
-                . "left join person p left join organization org on p.organization_id = org.id "
-                . "on c.person_id = p.id "
-                . "on o.contact_id = c.id "
-                . "where o.id=".$_GET['id'];
-        
-        if($conn->connect_error) {
-            die('Ошибка соединения: ' . $conn->connect_error);
-        }
-        
-        $conn->query('set names utf8');
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
-            $contact_date = $row['date'];
-            $organization = $row['organization'];
-            $last_name = $row['last_name'];
-            $first_name = $row['first_name'];
-            $middle_name = $row['middle_name'];
-            $product = $row['product'];
-            $number = $row['number'];
-            $price = $row['price'];
-            $shipment_date = $row['shipment_date'];
-            $contract_date = $row['contract_date'];
-            $bill_date = $row['bill_date'];
-        }
-        $conn->close();
-        ?>
     </head>
     <body>
         <?php
@@ -121,9 +119,7 @@ include '../include/topscripts.php';
         <div class="container-fluid">
             <?php
             if(isset($error_message) && $error_message != '') {
-               echo <<<ERROR
-               <div class="alert alert-danger">$error_message</div>
-               ERROR;
+               echo "<div class='alert alert-danger'>$error_message</div>";
             }
             ?>
             <div class="row">

@@ -4,40 +4,40 @@
             <span class="font-awesome">&#xf015;</span>
         </a>
         <ul class="navbar-nav mr-auto">
-            <?php
-            $organization_status = $_SERVER['PHP_SELF'] == APPLICATION.'/organization/index.php' ? ' disabled' : '';
-            $allorgs_status = $_SERVER['PHP_SELF'] == APPLICATION.'/organization/all.php' ? ' disabled' : '';
-            $call_status = $_SERVER['PHP_SELF'] == APPLICATION.'/contact/index.php' ? ' disabled' : '';
-            $planned_status = $_SERVER['PHP_SELF'] == APPLICATION.'/planned/index.php' ? ' disabled' : '';
-            $order_status = $_SERVER['PHP_SELF'] == APPLICATION.'/order/index.php' ? ' disabled' : '';
-            $personal_status = $_SERVER['PHP_SELF'] == APPLICATION.'/personal/index.php' ? ' disabled' : '';
-            $manager_status = $_SERVER['PHP_SELF'] == APPLICATION.'/manager/index.php' ? ' disabled' : '';
-            $film_status = $_SERVER['PHP_SELF'] == APPLICATION.'/film/index.php' ? ' disabled' : '';
+        <?php
+        $organization_status = $_SERVER['PHP_SELF'] == APPLICATION.'/organization/index.php' ? ' disabled' : '';
+        $allorgs_status = $_SERVER['PHP_SELF'] == APPLICATION.'/organization/all.php' ? ' disabled' : '';
+        $call_status = $_SERVER['PHP_SELF'] == APPLICATION.'/contact/index.php' ? ' disabled' : '';
+        $planned_status = $_SERVER['PHP_SELF'] == APPLICATION.'/planned/index.php' ? ' disabled' : '';
+        $order_status = $_SERVER['PHP_SELF'] == APPLICATION.'/order/index.php' ? ' disabled' : '';
+        $personal_status = $_SERVER['PHP_SELF'] == APPLICATION.'/personal/index.php' ? ' disabled' : '';
+        $manager_status = $_SERVER['PHP_SELF'] == APPLICATION.'/manager/index.php' ? ' disabled' : '';
+        $film_status = $_SERVER['PHP_SELF'] == APPLICATION.'/film/index.php' ? ' disabled' : '';
 
-            if(LoggedIn()) {
-                // Количество запланированных контактов
-                $planned_count = 0;
+        if(LoggedIn()) {
+            // Количество запланированных контактов
+            $planned_count = 0;
                 
-                $planned_conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-                $planned_sql = "select count(c.id) count "
-                            . "from contact c "
-                            . "inner join person p "
-                            . "inner join organization o on p.organization_id = o.id "
-                            . "on c.person_id = p.id "
-                            . "where o.manager_id=".GetManagerId()." "
-                            . "and c.next_date is not null "
-                            . "and UNIX_TIMESTAMP(c.next_date) < UNIX_TIMESTAMP(DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY)) "
-                            . "and (select count(id) from contact where person_id = p.id and UNIX_TIMESTAMP(date) >= UNIX_TIMESTAMP(CURRENT_DATE())) = 0";
+            $planned_conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+            $planned_sql = "select count(c.id) count "
+                        . "from contact c "
+                        . "inner join person p "
+                        . "inner join organization o on p.organization_id = o.id "
+                        . "on c.person_id = p.id "
+                        . "where o.manager_id=".GetManagerId()." "
+                        . "and c.next_date is not null "
+                        . "and UNIX_TIMESTAMP(c.next_date) < UNIX_TIMESTAMP(DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY)) "
+                        . "and (select count(id) from contact where person_id = p.id and UNIX_TIMESTAMP(date) >= UNIX_TIMESTAMP(CURRENT_DATE())) = 0";
                     
-                    if($planned_conn->connect_error) {
-                        die('Ошибка соединения: ' . $planned_conn->connect_error);
-                    }
+                if($planned_conn->connect_error) {
+                    die('Ошибка соединения: ' . $planned_conn->connect_error);
+                }
                     
-                    $planned_result = $planned_conn->query($planned_sql);
-                    if ($planned_result->num_rows > 0 && $planned_row = $planned_result->fetch_assoc()) {
-                        $planned_count = $planned_row['count'];
-                    }
-                    $planned_conn->close();
+                $planned_result = $planned_conn->query($planned_sql);
+                if ($planned_result->num_rows > 0 && $planned_row = $planned_result->fetch_assoc()) {
+                    $planned_count = $planned_row['count'];
+                }
+                $planned_conn->close();
             ?>
             <li class="nav-item">
                 <a class="nav-link<?=$organization_status ?>" href="<?=APPLICATION ?>/organization/">Мои предприятия</a>

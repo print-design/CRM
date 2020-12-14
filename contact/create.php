@@ -1,122 +1,120 @@
 <?php
 include '../include/topscripts.php';
+include '../include/restrict_logged_in.php';
+
+// Если нет параметра person
+// переходим к списку предприятий
+if(!isset($_GET['person'])) {
+    header('Location: '.APPLICATION.'/organization/');
+}
+        
+// Валидация формы
+define('ISINVALID', ' is-invalid');
+$form_valid = true;
+$error_message = '';
+        
+$result_id_valid = '';
+        
+// Обработка отправки формы
+if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['contact_create_submit'])) {
+    if($_POST['result_id'] == '') {
+        $result_id_valid = ISINVALID;
+        $form_valid = false;
+    }
+            
+    if($form_valid) {
+        $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+        if($conn->connect_error) {
+            die('Ошибка соединения: '.$conn->connect_error);
+        }
+                
+        $manager_id = $_POST['manager_id'];
+        $person_id = $_POST['person_id'] == '' ? 'NULL' : $_POST['person_id'];
+        $result_id = $_POST['result_id'];
+        $next_date = $_POST['next_date'] == '' ? 'NULL' : DateTime::createFromFormat("d.m.Y", $_POST['next_date']);
+        $next_timestamp = $_POST['next_date'] == '' ? 'NULL' : "from_unixtime(".$next_date->gettimestamp().")";
+        $comment = $_POST['comment'];
+                
+        $sql = "insert into contact "
+                . "(manager_id, person_id, result_id, next_date, comment) "
+                . "values "
+                . "($manager_id, $person_id, $result_id, $next_timestamp, '$comment')";
+                
+        if ($conn->query($sql) === true) {
+            $contact_id = $conn->insert_id;
+            $is_order = 0;
+            $organization_id = '';
+                    
+            $sql_order = 'select p.organization_id, r.is_order from contact c '
+                    . 'inner join person p on c.person_id = p.id '
+                    . 'inner join contact_result r on c.result_id = r.id where c.id='.$contact_id;
+                    
+            $conn->query('set names utf8');
+            $result_order = $conn->query($sql_order);
+                    
+            if($result_order->num_rows > 0 && $row_order = $result_order->fetch_assoc()) {
+                $organization_id = $row_order['organization_id'];
+                $is_order = $row_order['is_order'];
+            }
+                    
+            if($is_order > 0) {
+                $sql_order = "insert into _order (contact_id) values ($contact_id)";
+                        
+                $conn->query('set names utf8');
+                if($conn->query($sql_order) === true) {
+                    $order_id = $conn->insert_id;
+                    header('Location: '.APPLICATION.'/order/edit.php?id='.$order_id);
+                }
+            }
+            else if($organization_id != '') {
+                header('Location: '.APPLICATION.'/organization/details.php?id='.$organization_id);
+            }
+        }
+        else {
+            $error_message = $conn->error;
+        }
+                
+        $conn->close();
+    }
+}
+        
+// Получение контактного лица
+$person = '';
+$organization_id = '';
+$organization = '';
+$production = '';
+$position = '';
+$phone = '';
+$email = '';
+$conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+if($conn->connect_error) {
+    die('Ошибка соединения: ' . $conn->connect_error);
+}
+        
+$sql = "select o.id organization_id, o.name organization, o.production, p.name person, p.position, p.phone, p.email from person p inner join organization o on p.organization_id = o.id where p.id=".$_GET['person'];
+        
+$conn->query('set names utf8');
+$result = $conn->query($sql);
+        
+if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
+    $person = $row['person'];
+    $organization_id = $row['organization_id'];
+    $organization = $row['organization'];
+    $production = $row['production'];
+    $position = $row['position'];
+    $phone = $row['phone'];
+    $email = $row['email'];
+}
+        
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html>
     <head>
         <?php
         include '../include/head.php';
-        include '../include/restrict_logged_in.php';
         ?>
         <link href="<?=APPLICATION ?>/css/jquery-ui.css" rel="stylesheet"/>
-        
-        <?php
-        // Если нет параметра person
-        // переходим к списку предприятий
-        if(!isset($_GET['person'])) {
-            header('Location: '.APPLICATION.'/organization/');
-        }
-        
-        // Валидация формы
-        define('ISINVALID', ' is-invalid');
-        $form_valid = true;
-        $error_message = '';
-        
-        $result_id_valid = '';
-        
-        // Обработка отправки формы
-        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['contact_create_submit'])) {
-            if($_POST['result_id'] == '') {
-                $result_id_valid = ISINVALID;
-                $form_valid = false;
-            }
-            
-            if($form_valid) {
-                $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-                if($conn->connect_error) {
-                    die('Ошибка соединения: '.$conn->connect_error);
-                }
-                
-                $manager_id = $_POST['manager_id'];
-                $person_id = $_POST['person_id'] == '' ? 'NULL' : $_POST['person_id'];
-                $result_id = $_POST['result_id'];
-                $next_date = $_POST['next_date'] == '' ? 'NULL' : DateTime::createFromFormat("d.m.Y", $_POST['next_date']);
-                $next_timestamp = $_POST['next_date'] == '' ? 'NULL' : "from_unixtime(".$next_date->gettimestamp().")";
-                $comment = $_POST['comment'];
-                
-                $sql = "insert into contact "
-                        . "(manager_id, person_id, result_id, next_date, comment) "
-                        . "values "
-                        . "($manager_id, $person_id, $result_id, $next_timestamp, '$comment')";
-                
-                if ($conn->query($sql) === true) {
-                    $contact_id = $conn->insert_id;
-                    $is_order = 0;
-                    $organization_id = '';
-                    
-                    $sql_order = 'select p.organization_id, r.is_order from contact c '
-                            . 'inner join person p on c.person_id = p.id '
-                            . 'inner join contact_result r on c.result_id = r.id where c.id='.$contact_id;
-                    
-                    $conn->query('set names utf8');
-                    $result_order = $conn->query($sql_order);
-                    
-                    if($result_order->num_rows > 0 && $row_order = $result_order->fetch_assoc()) {
-                        $organization_id = $row_order['organization_id'];
-                        $is_order = $row_order['is_order'];
-                    }
-                    
-                    if($is_order > 0) {
-                        $sql_order = "insert into _order (contact_id) values ($contact_id)";
-                        
-                        $conn->query('set names utf8');
-                        if($conn->query($sql_order) === true) {
-                            $order_id = $conn->insert_id;
-                            header('Location: '.APPLICATION.'/order/edit.php?id='.$order_id);
-                        }
-                    }
-                    else if($organization_id != '') {
-                        header('Location: '.APPLICATION.'/organization/details.php?id='.$organization_id);
-                    }
-                }
-                else {
-                    $error_message = $conn->error;
-                }
-                
-                $conn->close();
-            }
-        }
-        
-        // Получение контактного лица
-        $person = '';
-        $organization_id = '';
-        $organization = '';
-        $production = '';
-        $position = '';
-        $phone = '';
-        $email = '';
-        $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-        if($conn->connect_error) {
-            die('Ошибка соединения: ' . $conn->connect_error);
-        }
-        
-        $sql = "select o.id organization_id, o.name organization, o.production, p.name person, p.position, p.phone, p.email from person p inner join organization o on p.organization_id = o.id where p.id=".$_GET['person'];
-        
-        $conn->query('set names utf8');
-        $result = $conn->query($sql);
-        
-        if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
-            $person = $row['person'];
-            $organization_id = $row['organization_id'];
-            $organization = $row['organization'];
-            $production = $row['production'];
-            $position = $row['position'];
-            $phone = $row['phone'];
-            $email = $row['email'];
-        }
-        
-        $conn->close();
-        ?>
     </head>
     <body>
         <?php
@@ -125,9 +123,7 @@ include '../include/topscripts.php';
         <div class="container-fluid">
             <?php
             if(isset($error_message) && $error_message != '') {
-               echo <<<ERROR
-               <div class="alert alert-danger">$error_message</div>
-               ERROR;
+               echo "<div class='alert alert-danger'>$error_message</div>";
             }
             ?>
             <div class="row">

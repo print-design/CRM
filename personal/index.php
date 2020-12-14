@@ -1,36 +1,36 @@
 <?php
 include '../include/topscripts.php';
+include '../include/restrict_logged_in.php';
+        
+// Получение личных данных
+$last_name = '';
+$first_name = '';
+$middle_name = '';
+$username = '';
+        
+$conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+$sql = "select last_name, first_name, middle_name, username 
+    from manager where id=".GetManagerId();
+        
+if($conn->connect_error) {
+    die('Ошибка соединения: ' . $conn->connect_error);
+}
+        
+$conn->query('set names utf8');
+$result = $conn->query($sql);
+if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
+    $last_name = $row['last_name'];
+    $first_name = $row['first_name'];
+    $middle_name = $row['middle_name'];
+    $username = $row['username'];
+}
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html>
     <head>
         <?php
         include '../include/head.php';
-        include '../include/restrict_logged_in.php';
-        
-        // Получение личных данных
-        $last_name = '';
-        $first_name = '';
-        $middle_name = '';
-        $username = '';
-        
-        $conn = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
-        $sql = "select last_name, first_name, middle_name, username 
-            from manager where id=".GetManagerId();
-        
-        if($conn->connect_error) {
-            die('Ошибка соединения: ' . $conn->connect_error);
-        }
-        
-        $conn->query('set names utf8');
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0 && $row = $result->fetch_assoc()) {
-            $last_name = $row['last_name'];
-            $first_name = $row['first_name'];
-            $middle_name = $row['middle_name'];
-            $username = $row['username'];
-        }
-        $conn->close();
         ?>
     </head>
     <body>
@@ -40,15 +40,11 @@ include '../include/topscripts.php';
         <div class="container-fluid">
             <?php
             if(isset($error_message) && $error_message != '') {
-               echo <<<ERROR
-               <div class="alert alert-danger">$error_message</div>
-               ERROR;
+               echo "<div class='alert alert-danger'>$error_message</div>";
             }
                
             if(isset($_GET['password']) && $_GET['password'] == 'true') {
-                echo <<<PASSWORD
-                <div class="alert alert-info">Пароль успешно изменён</div>
-                PASSWORD;
+                echo "<div class='alert alert-info'>Пароль успешно изменён</div>";
             }
             ?>
             <div class="row">

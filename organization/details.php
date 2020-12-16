@@ -217,8 +217,6 @@ $conn->close();
                                 <th>Менеджер</th>
                                 <th>Конт. лицо</th>
                                 <th>Должность</th>
-                                <!--th>Телефон</th-->
-                                <!--th>E-mail</th-->
                                 <th>Результат</th>
                                 <th>Действ.</th>
                                 <th>След.</th>
@@ -233,10 +231,9 @@ $conn->close();
                             $sql = "select c.id id, date_format(c.date, '%d.%m.%Y') date, u.first_name, u.middle_name, u.last_name, r.name result, r.efficient, date_format(c.next_date, '%d.%m.%Y') next_date, "
                                     . "p.name, p.position, p.phone, p.email, c.comment "
                                     . "from person p "
-                                    . "inner join contact c "
+                                    . "inner join contact c on c.person_id = p.id "
                                     . "inner join manager u on c.manager_id = u.id "
                                     . "inner join contact_result r on c.result_id = r.id "
-                                    . "on c.person_id = p.id "
                                     . "where p.organization_id=".$_GET['id']." "
                                     . "order by c.id desc";
                             
@@ -253,8 +250,6 @@ $conn->close();
                                         ."<td>".$row['last_name'].' '.mb_substr($row['first_name'], 0, 1, 'UTF-8').'. '.mb_substr($row['middle_name'], 0, 1, 'UTF-8').".</td>"
                                         ."<td>".$row['name']."</td>"
                                         ."<td>".$row['position']."</td>"
-                                        //."<td>".$row['phone']."</td>"
-                                        //."<td>".$row['email']."</td>"
                                         ."<td>".$row['result']."</td>"
                                         ."<td>".($row['efficient'] == '1' ? '&#x2713;' : '')."</td>"
                                         ."<td>".$row['next_date']."</td>"
